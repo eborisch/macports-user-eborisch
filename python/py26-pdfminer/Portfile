@@ -9,7 +9,7 @@ version             20100424
 platforms           darwin
 categories          python
 license             MIT
-maintainers         macports.org:eborisch \
+maintainers         eborisch \
                     openmaintainer
 description         Python pdf extraction package
 
@@ -28,7 +28,9 @@ homepage            http://www.unixuser.org/~euske/python/pdfminer/
 master_sites        http://pypi.python.org/packages/source/p/pdfminer/
 distname            pdfminer-${version}
 
-checksums           md5 d69836472cd1d555a7340e0fe75c5e20
+checksums           md5     d69836472cd1d555a7340e0fe75c5e20 \
+                    sha1    11027db5ad5d787eab5489250ca32f422d279857 \
+                    rmd160  fd9d4ca6a0f4e1e001919388b83da9b1a50f9d34
 
 depends_lib-append  port:py26-distribute
 
