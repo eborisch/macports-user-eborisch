@@ -64,6 +64,8 @@ def scanDeps(a, depth):
       style = "[style=dotted]"
     elif re.search("Library Dependencies",line):
       style = ""
+    elif re.search("Runtime Dependencies",line):
+      style = "[style=dashed]"
     else:
       continue
 
@@ -92,6 +94,7 @@ dotProc = Popen(["dot","-Tpng"], stdin=PIPE, stdout=PIPE)
 dotProc.stdin.write("Digraph G {")
 for port in sys.argv[1:]:
   scanDeps(port, 0)
+dotProc.stdin.write('graph [label="Dependencies of %s"]' % ','.join(sys.argv[1:]))
 dotProc.stdin.write("}")
 
 if dotProc.returncode:
