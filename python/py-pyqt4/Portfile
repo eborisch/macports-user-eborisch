@@ -56,17 +56,19 @@ variant phonon description {Add phonon support} {
     depends_lib-append      port:phonon
 }
 
-variant scintilla description {Add QScintilla API file } {
-    configure.args-delete   --no-qsci-api
-    configure.args-append   --qsci-api
-    depends_lib-append      port:py27-qscintilla
+if {${python.version} == 26 || ${python.version} == 27} {
+    variant scintilla description {Add QScintilla API file } {
+        configure.args-delete   --no-qsci-api
+        configure.args-append   --qsci-api
+        depends_lib-append      port:py${python.version}-qscintilla
+    }
 }
 
 # The patch file alters configure.py so that the qtdesigner plugin can link.
 # - it ensures that both LFLAGS are included and that the relevant version framework is linked
 patchfiles	patch-configure.py
 post-patch {
-    reinplace "s|@@MACPORTS_PYTHON_FRAMEWORK@@|${frameworks_dir}/Python.framework/Versions/${python.branch}/Python|" ${worksrcpath}/configure.py
+    reinplace "s|@@MACPORTS_PYTHON_FRAMEWORK@@|${python.prefix}/Python|" ${worksrcpath}/configure.py
 }
 
 use_configure yes
@@ -173,3 +175,4 @@ variant debug description "Build debug libraries" {
 livecheck.type   regex
 livecheck.url    http://www.riverbankcomputing.co.uk/software/pyqt/download
 livecheck.regex  "PyQt-mac-gpl-(\[0-9.\]\\.\[0-9.\]\\.\[0-9.\]).tar.gz"
+
