@@ -127,13 +127,13 @@ build.cmd         make
 build.target    all
 use_parallel_build yes
 
+destroot.cmd      ${build.cmd}
+destroot.destdir  DESTDIR=${destroot}
+
 test.run	yes
 test.cmd	cd qt && ${python.bin} -c 'import PyQt4'
 
 post-destroot {
-    ln -s ${frameworks_dir}/Python.framework/Versions/${python.branch}/bin/pyrcc4 ${destroot}${prefix}/bin/pyrcc4-${python.branch}
-    ln -s ${frameworks_dir}/Python.framework/Versions/${python.branch}/bin/pyuic4 ${destroot}${prefix}/bin/pyuic4-${python.branch}
-
 	xinstall -m 755 -d ${destroot}${prefix}/share/doc
 	file copy ${worksrcpath}/doc ${destroot}${prefix}/share/doc/${name}
 	file copy ${worksrcpath}/examples \
