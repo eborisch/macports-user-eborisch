@@ -7,6 +7,7 @@ PortGroup   python 1.0
 
 name		py-pyqt4
 version		4.8.5
+revision    1
 python.versions   24 25 26 27 31
 categories	python devel
 platforms	macosx
@@ -136,17 +137,21 @@ test.run	yes
 test.cmd	cd qt && ${python.bin} -c 'import PyQt4'
 
 post-destroot {
-	xinstall -m 755 -d ${destroot}${prefix}/share/doc
-	file copy ${worksrcpath}/doc ${destroot}${prefix}/share/doc/${name}
-	file copy ${worksrcpath}/examples \
-		${destroot}${prefix}/share/doc/${name}
+	# Clean out empty dirs first
+    set docdir ${destroot}${prefix}/share/doc
+    file delete ${docdir}/${subport}/examples
+	file delete ${docdir}/${subport}/
+	file copy ${worksrcpath}/doc ${docdir}/${subport}
+    file copy ${worksrcpath}/examples \
+		${docdir}/${subport}
 	xinstall -m 644 -W ${worksrcpath} \
 		GPL_EXCEPTION.TXT GPL_EXCEPTION_ADDENDUM.TXT \
 		LICENSE.GPL2 LICENSE.GPL3 OPENSOURCE-NOTICE.TXT NEWS README \
 		THANKS \
-		${destroot}${prefix}/share/doc/${name}
+		${docdir}/${subport}
 
-    # This file exists if Qt was installed non-universal. Easiest just to check if it was created
+    # This file exists if Qt was installed non-universal. 
+    # Easiest just to check if it was created
     if {[file exists ${destroot}${qt_plugins_dir}/designer/libpythonplugin.dylib]} {
         # rename Qt4 specific files
         # (a) designer plugin
@@ -160,7 +165,7 @@ post-destroot {
     }
 
     # (b) Qsci API file, if it exists (if Qsci is installed at build time)
-    if {[file exists ${destroot}${qt_data_dir}/qsci/api/python/PyQt4.api]} {
+	if {[variant_isset scintilla]} {
         move ${destroot}${qt_data_dir}/qsci/api/python/PyQt4.api \
             ${destroot}${qt_data_dir}/qsci/api/python/PyQt4-Python${python.branch}.api
     }
