@@ -1,0 +1,65 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+# $Id$
+
+PortSystem          1.0
+PortGroup           python 1.0
+PortGroup           wxWidgets 1.0
+
+name                py-robotframework-ride
+set internal_name   robotframework-ride
+
+version             1.1
+revision            1
+
+license             Apache-2
+
+categories-append   devel
+maintainers         jwa
+description         Robot Framework test case editor
+long_description    ${description}
+
+homepage            http://code.google.com/p/${internal_name}
+
+platforms           darwin
+python.versions     26 27
+python.default_version 27
+
+# TODO: this is not a proper way to do it;
+#       wxWidgets.use should take care of supported architectures
+#       depending on whether the port depends on carbon or gtk variant of wxpython-2.8
+universal_variant   no
+supported_archs     i386
+
+master_sites        googlecode:${internal_name}
+distname            ${internal_name}-${version}
+
+checksums           rmd160  8b299cf3876e109664b89b94fe24c4845a279061 \
+                    sha256  5e4f3ecaba03d520db6eacf99108732b12157a66cc94cd99475d5d879f94bd1b
+
+if {$subport != $name} {
+    build.cmd           ${python.bin} setup.py
+    destroot.cmd        ${python.bin} setup.py
+    depends_lib-append  port:py${python.version}-robotframework \
+        port:py${python.version}-wxpython-2.8 \
+        port:py${python.version}-paver
+
+    if {${os.major}>=12} {
+        supported_archs    x86_64
+        depends_lib-delete port:py${python.version}-wxpython-2.8
+        depends_lib-append port:py${python.version}-wxpython-3.0
+    }
+
+    post-extract {
+        reinplace "s/pybot/pybot-${python.branch}/g" $worksrcpath/src/robotide/contrib/testrunner/runprofiles.py
+    }
+
+    notes "To run, use 'arch -i386 ride.py-${python.branch}' to use 32bit architecture"
+}
+
+if {$subport == $name} {
+    livecheck.type     regex
+    livecheck.url      ${homepage}
+    livecheck.regex    ${internal_name}-(\[0-9.\]+)\\.tar\\.\[bg\]z
+} else {
+    livecheck.type		none
+}

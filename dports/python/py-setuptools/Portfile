@@ -1,0 +1,50 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+# $Id$
+
+PortSystem          1.0
+PortGroup           python 1.0
+
+name                py-setuptools
+version             1.1
+categories-append   devel
+license             {PSF ZPL}
+maintainers         jmr openmaintainer
+description         distutils enhancement for build and distribution
+long_description \
+    setuptools is a collection of enhancements to the Python distutils that \
+    allow you to more easily build and distribute Python packages, \
+    especially ones that have dependencies on other packages.
+
+platforms           darwin
+supported_archs     noarch
+
+homepage            https://pypi.python.org/pypi/setuptools/
+master_sites        https://pypi.python.org/packages/source/s/setuptools/
+distname            setuptools-${version}
+
+checksums           md5    84062633c3818c912af76d54a40d11a7 \
+                    rmd160 537aae8005e631ea09d2dd6e0411a98c5661bb9e \
+                    sha256 56dde93a410389fc6cb86e9c115249a3414f8982c96d99aeac43a7717dd05b5e
+
+python.versions     24 25 26 27 31 32 33
+python.default_version 27
+python.link_binaries no
+python.move_binaries no
+
+if {$subport != $name} {
+    post-destroot {
+       xinstall -m 755 -d ${destroot}${prefix}/share/doc/${subport}
+       xinstall -m 644 -W ${worksrcpath} CHANGES.txt CONTRIBUTORS.txt \
+          DEVGUIDE.txt README.txt ${destroot}${prefix}/share/doc/${subport}
+       if {${python.version} <= 25} {
+          delete "${destroot}${prefix}/bin/easy_install"
+       } else {
+          ln -s "${python.prefix}/bin/easy_install-${python.branch}" "${destroot}${prefix}/bin/"
+       }
+    }
+    livecheck.type      none
+} else {
+    livecheck.type      regex
+    livecheck.url       ${homepage}
+    livecheck.regex     setuptools/(\\d+(\\.\\d+)+)
+}

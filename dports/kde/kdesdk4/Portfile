@@ -1,0 +1,34 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+# $Id$
+
+PortSystem          1.0
+PortGroup           kde4   1.1
+
+name                kdesdk4
+version             4.10.5
+categories          kde kde4
+maintainers         sharky nicos
+license             GPL-2+ LGPL-2+ GFDL-1.2
+description         Utilities to ease development with the KDE4 platform
+long_description    Scripts and tools which simplify development of KDE applications. e.g. Kate, the advanced text editor.
+platforms           darwin
+homepage            http://www.kde.org
+master_sites        kde:stable/${version}/src/
+use_xz              yes
+distname            kdesdk-${version}
+
+checksums           rmd160  6b0ff3248dcb478251e88abb50cea1fd4765b085 \
+                    sha256  e8c076cc83d4e43d021993c4e6ca037762c69486d8fce7c2770c23f55ba13140
+
+depends_lib-append  port:kde4-baseapps \
+                    port:antlr \
+                    port:boost \
+                    port:subversion
+
+universal_variant   no
+
+patchfiles          patch-catalogitem.diff \
+                    patch-kcachegrind-CMakeLists.diff
+
+livecheck.url       http://kde.mirrors.hoobly.com/stable/
+livecheck.regex     (\\d+(\\.\\d+)+)

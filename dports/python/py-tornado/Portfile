@@ -1,0 +1,42 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+# $Id$
+
+PortSystem          1.0
+PortGroup           python 1.0
+
+name                py-tornado
+version             3.1
+revision            0
+categories-append   www
+platforms           darwin
+license             Apache-2
+supported_archs     noarch
+
+python.versions     26 27 32 33
+
+maintainers         stromnov openmaintainer
+
+description         Scalable, non-blocking web server and related tools
+
+long_description    \
+    Tornado is an open source version of the scalable, non-blocking web server \
+    and tools that power FriendFeed. The FriendFeed application is written \
+    using a web framework that looks a bit like web.py or Google's webapp, \
+    but with additional tools and optimizations to take advantage of the \
+    underlying non-blocking infrastructure.
+
+homepage            http://www.tornadoweb.org/
+master_sites        http://pypi.python.org/packages/source/t/tornado/
+
+distname            tornado-${version}
+
+checksums           rmd160  3354a67cbc70aa12d573c68e5c0427e3b5198c96 \
+                    sha256  898b577e37b8681bf3d31483b7a30a2db062e99fb1b2b2cb65d203759d3a88d0
+
+if {$subport != $name} {
+    livecheck.type      none
+} else {
+    livecheck.type      regex
+    livecheck.url       ${master_sites}
+    livecheck.regex     "tornado-(\\d+(?:\\.\\d+)*)${extract.suffix}"
+}

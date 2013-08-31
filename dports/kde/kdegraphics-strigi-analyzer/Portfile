@@ -1,0 +1,29 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+# $Id$
+
+PortSystem          1.0
+PortGroup           kde4   1.1
+
+name                kdegraphics-strigi-analyzer
+version             4.10.5
+categories          kde kde4
+license             GPL-2+ LGPL-2+
+maintainers         nicos openmaintainer
+description         Component of kdegraphics
+long_description    ${description}
+platforms           darwin
+homepage            http://www.kde.org/
+master_sites        kde:stable/${version}/src/
+use_xz              yes
+distname            kdegraphics-strigi-analyzer-${version}
+checksums           rmd160  6bff6758eb99aecb2fa6991ebc640ac5e9f1a095 \
+                    sha256  a594e8dfc8dfc5cbea1c16762f44170c9b3c1c29528a8e4f7afd16eeeab7e31f
+
+#Binaries do not link to openssl, nor use the ssl backend of kdelibs4
+license_noconflict  openssl
+
+depends_lib-append  port:kdelibs4 \
+                    port:tiff port:strigi
+
+livecheck.url       http://kde.mirrors.hoobly.com/stable/
+livecheck.regex     (\\d+(\\.\\d+)+)

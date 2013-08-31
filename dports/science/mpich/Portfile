@@ -1,0 +1,178 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+# $Id$
+
+PortSystem          1.0
+
+# TODO: Improve universal.  The only issue is with ${prefix}/include/mpif.h
+#       It requires preprocessing, so it will work with #include directives
+#       but not if clients use INCLUDE
+#PortGroup           muniversal 1.0
+universal_variant    no
+
+PortGroup           compiler_blacklist_versions 1.0
+
+name                mpich
+version             3.0.4
+revision            3
+
+license             BSD
+categories          science parallel net
+platforms           darwin
+maintainers         eborisch \
+                    openmaintainer
+
+description         Message Passing Interface (MPI) Library
+
+long_description    MPICH is a high-performance and widely portable\
+                    implementation of the Message Passing Interface (MPI) \
+                    standard (MPI-1, MPI-2 and MPI-3). The goals of MPICH are:\
+                    (1) to provide an MPI implementation that efficiently\
+                    supports different computation and communication platforms\
+                    including commodity clusters (desktop systems,\
+                    shared-memory systems, multicore architectures), high-speed\
+                    networks (10 Gigabit Ethernet, InfiniBand, Myrinet,\
+                    Quadrics) and proprietary high-end computing systems (Blue\
+                    Gene, Cray) and (2) to enable cutting-edge research in MPI\
+                    through an easy-to-extend modular framework for other\
+                    derived implementations. \n\
+                    \n\
+                    The mpich port follows the latest mpich 3.x line, and is \
+                    the successor to the mpich2 port. Starting with the major \
+                    release in November 2012, the project is renamed back to \
+                    MPICH (from MPICH2) with a version number of 3.0. 
+homepage            http://www.mpich.org/
+
+checksums \
+    rmd160  c14b3b335be863dd36c0a58630c969719d8ef217 \
+    sha256  cf638c85660300af48b6f776e5ecd35b5378d5905ec5d34c3da7a27da0acf0b3
+
+configure.args      --disable-dependency-tracking \
+                    --enable-f77 \
+                    --enable-fc \
+                    --disable-silent-rules \
+                    --enable-base-cache \
+                    --enable-cache \
+                    --enable-cxx \
+                    --enable-fast=Os \
+                    --enable-shared \
+                    --enable-smpcoll \
+                    --with-device=ch3:nemesis \
+                    --with-pm=hydra \
+                    --with-thread-package=posix \
+                    --enable-versioning \
+                    "F90FLAGS='' F90=''"
+
+subport mpich-devel {
+    conflicts           mpich
+#    version             3.0.1
+}
+
+if {${subport} == ${name}} {
+    conflicts           mpich-devel
+}
+
+master_sites        ${homepage}static/tarballs/${version}/
+
+conflicts-append    mpich2 \
+                    mpich2-devel \
+                    lammpi \
+                    openmpi
+
+depends_lib-append  port:libxml2
+
+# Linker for Apple clang version 421.11.66 segfaults 
+# See https://trac.macports.org/ticket/36654#comment:9 
+compiler.blacklist-append   {clang >= 421.11.66 < 425.0.24} 
+
+platform darwin {
+    configure.args-append   --enable-timer-type=mach_absolute_time
+}
+
+# We're making compiler wrappers here... don't default to -Os for wrappers.
+# Actual library code is compiled with -Os via --enable-fast=Os configure arg
+configure.optflags-delete -O2 -Os
+configure.cppflags-delete -I${prefix}/include
+
+# As MPICH creates compiler wrappers, there are lots of
+# variants for what compiler the user would like to wrap.
+
+variant gforker description {
+    Use gforker process manager instead of the default hydra
+} {
+    configure.args-append   --with-pm=gforker
+    configure.args-delete   --with-pm=hydra
+}
+
+variant tuned description {Build with more optimizations} {
+    configure.args-delete       --enable-fast=Os
+    configure.args-append       --enable-fast=all \
+                                MPICHLIB_CFLAGS='-fomit-frame-pointer -O2'
+}
+
+set gcc_versions {4.3 4.4 4.5 4.6 4.7 4.8 4.9}
+set default_fortran_variant +gcc48
+set g95_conflicts {}
+
+foreach ver ${gcc_versions} {
+    set ver_no_dot [join [split ${ver} "."] ""]
+
+    set variant_line {variant gcc${ver_no_dot} description "build with gfortran from gcc${ver_no_dot}" conflicts g95}
+
+    foreach over ${gcc_versions} {
+        if {${ver} == ${over}} {
+            continue
+        }
+
+        set over_no_dot [join [split ${over} "."] ""]
+        append variant_line " conflicts gcc${over_no_dot}"
+    }
+    append variant_line { {}}
+
+    eval $variant_line
+
+    append g95_conflicts " conflicts gcc${ver_no_dot}"
+
+    if {[variant_isset gcc${ver_no_dot}]} {
+        if {${default_fortran_variant} != "+gcc${ver_no_dot}"} {
+            set default_fortran_variant ""
+        }
+    }
+}
+
+eval [concat {variant g95 description {build with g95}} $g95_conflicts {{}}]
+
+if {[variant_isset g95]} {
+    if {${default_fortran_variant} != "+g95"} {
+        set default_fortran_variant ""
+    }
+}
+
+if {${default_fortran_variant} != ""} {
+    default_variants "${default_fortran_variant}"
+}
+
+foreach ver ${gcc_versions} {
+    set ver_no_dot [join [split ${ver} "."] ""]
+
+    if {[variant_isset gcc${ver_no_dot}]} {
+        depends_lib-append path:lib/libgcc/libgcc_s.1.dylib:libgcc
+        depends_build-append port:gcc${ver_no_dot}
+
+        configure.fc  ${prefix}/bin/gfortran-mp-${ver}
+        configure.f77 ${prefix}/bin/gfortran-mp-${ver}
+        configure.f90 ${prefix}/bin/gfortran-mp-${ver}
+    }
+}
+
+if {[variant_isset g95]} {
+    depends_lib-append path:lib/libgcc/libgcc_s.1.dylib:libgcc
+    depends_build-append port:g95
+
+    configure.fc ${prefix}/bin/g95
+    configure.f77 ${prefix}/bin/g95
+    configure.f90 ${prefix}/bin/g95
+}
+
+livecheck.type      regex
+livecheck.regex     ${name}-(\[0-9.pbrc\]+)${extract.suffix}
+livecheck.url       ${homepage}downloads/index.php?s=downloads

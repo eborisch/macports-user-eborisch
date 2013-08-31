@@ -1,0 +1,51 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+# $Id$
+
+PortSystem                  1.0
+PortGroup                   perl5 1.0
+
+# Keep relevant lines in sync between ImageMagick and p5-perlmagick.
+
+epoch                       1
+perl5.branches              5.8 5.10 5.12 5.14 5.16
+perl5.setup                 PerlMagick 6.8.6-6
+set reasonable_version      [lindex [split ${version} -] 0]
+set my_name                 ImageMagick
+maintainers                 futurelab.ch:astricker ryandesign
+description                 Perl extension for calling ImageMagick's libMagick methods
+long_description            ${description}
+license                     ImageMagick
+platforms                   darwin
+use_xz                      yes
+
+# we use the ImageMagick distribution version of PerlMagick to
+# ensure it will always match ImageMagick version installed
+
+master_sites                http://image_magick.veidrodis.com/image_magick/ \
+                            ftp://ftp.sunet.se/pub/multimedia/graphics/ImageMagick \
+                            ftp://sunsite.icm.edu.pl/packages/ImageMagick
+
+dist_subdir                 ImageMagick
+distname                    ${my_name}-${version}
+
+checksums                   rmd160  aef9bb4482c918cae8364c9240bb9342f781c2a7 \
+                            sha256  c826e88a7880016af07f6edb44d5bc2a57caf184242c4c3c087a94849294c701
+
+if {${perl5.major} != ""} {
+depends_lib-append          port:ImageMagick
+
+    configure.dir           ${worksrcpath}/PerlMagick
+    build.dir               ${configure.dir}
+
+    pre-configure {
+        system -W ${worksrcpath} "CC=${configure.cc} CXX=${configure.cxx} ./configure --prefix=${prefix} --with-quantum-depth=16 --with-perl=${perl5.bin}"
+        system -W ${worksrcpath} "make perl-sources"
+    }
+
+livecheck.type              none
+} else {
+livecheck.version           ${reasonable_version}
+livecheck.type              regex
+livecheck.url               [lindex ${master_sites} 0]
+livecheck.regex             ${my_name}-(\\d+(?:\\.\\d+)*)(?:-\\d+)?
+}

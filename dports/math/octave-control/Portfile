@@ -1,0 +1,15 @@
+# $Id$
+
+PortSystem          1.0
+PortGroup           octave 1.0
+
+octave.setup        control 2.4.1
+platforms           darwin
+license             GPL-3+ GPL-2+
+maintainers         nomaintainer
+description         Additional Octave Control tools
+long_description    ${description}
+
+checksums           md5     e3312a9866ff6a9ee018f5c6657e7dce \
+                    sha1    c99e049fda72300a3e77a763b9c5a00829f91c0f \
+                    rmd160  3d83252b781da93f25e0e3f459cf767b83975b56

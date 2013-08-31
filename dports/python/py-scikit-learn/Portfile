@@ -1,0 +1,44 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+# $Id$
+
+PortSystem          1.0
+PortGroup           python 1.0
+
+name                py-scikit-learn
+version             0.14.1
+revision            0
+categories-append   science
+platforms           darwin
+license             BSD
+
+python.versions     26 27 32 33
+
+maintainers         stromnov openmaintainer
+
+description         Easy-to-use and general-purpose machine learning in Python
+
+long_description    Scikit-learn integrates machine learning algorithms \
+                    in the tightly-knit scientific Python world, building upon \
+                    numpy, scipy, and matplotlib. As a machine-learning module, \
+                    it provides versatile tools for data mining and analysis \
+                    in any field of science and engineering.
+
+homepage            http://scikit-learn.org/
+master_sites        http://pypi.python.org/packages/source/s/scikit-learn/
+
+distname            scikit-learn-${version}
+
+checksums           rmd160  c4cdf8b8f6f3a887fcc83238a959307b6393e62a \
+                    sha256  4c317cabb56c61f4c574879b53aa6bbea0132bb630678229bce98638f4b000e0
+
+if {$subport != $name} {
+    depends_lib-append  \
+                        port:py${python.version}-numpy \
+                        port:py${python.version}-scipy
+
+    livecheck.type      none
+} else {
+    livecheck.type      regex
+    livecheck.url       ${master_sites}
+    livecheck.regex     "scikit-learn-(\\d+(?:\\.\\d+)*)${extract.suffix}"
+}

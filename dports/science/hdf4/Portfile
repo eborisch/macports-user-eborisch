@@ -1,0 +1,110 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:et:sw=4:ts=4:sts=4
+# $Id$
+
+PortSystem          1.0
+
+name                hdf4
+version             4.2.9
+platforms           darwin
+categories          science
+license             NCSA
+maintainers         takeshi
+
+description         file format for storing scientific data and utilities
+long_description    ${description}
+homepage            http://www.hdfgroup.org/products/hdf4/index.html
+master_sites        ftp://ftp.hdfgroup.org/HDF/prev-releases/HDF${version}/src/ \
+                    http://www.hdfgroup.org/ftp/HDF/prev-releases/HDF${version}/src/
+distname            hdf-${version}
+use_bzip2           yes
+checksums           md5     c268a703f334ee4987fa710a0de9b9fc \
+                    sha1    c2251642e29c7acada37d5e599e68d270088e56d \
+                    rmd160  2052a35912bfe0eaa7f21b14325ebf60786d1e02
+
+depends_lib         port:zlib port:jpeg
+
+configure.args      --disable-netcdf --disable-fortran \
+                    --with-jpeg=${prefix} --enable-shared \
+                    --without-szlib
+configure.cppflags-delete   -I${prefix}/include
+configure.ldflags-delete    -L${prefix}/lib
+
+post-configure {
+# remove -arch from h4cc to fix failure of h4cc -E with +universal
+    reinplace -E {s|-arch [a-z0-9_]+||g} ${worksrcpath}/hdf/util/h4cc
+}
+
+test.run            yes
+test.target         check
+
+post-destroot {
+    file mkdir ${destroot}${prefix}/share/doc/${name}
+    file copy ${worksrcpath}/hdf/util/testfiles ${destroot}${prefix}/share/doc/${name}/samples
+    foreach f {COPYING release_notes/HISTORY.txt release_notes/RELEASE.txt} {
+        file copy ${worksrcpath}/$f ${destroot}${prefix}/share/doc/${name}/
+    }
+    foreach f {bin/ncdump bin/ncgen lib/libudport.a                   \
+             include/netcdf.h include/netcdf.inc include/netcdf.f90 \
+             share/man/man1/ncgen.1 share/man/man1/ncdump.1} {
+        file delete ${destroot}${prefix}/$f
+    }
+}
+
+variant g95 conflicts gcc43 gcc44 gcc45 gcc46 gcc47 gcc48 universal description {build with g95} {
+    configure.args-delete   --disable-fortran --enable-shared
+    depends_build-append    port:g95
+    configure.f77           ${prefix}/bin/g95
+    configure.fflags-append -fno-second-underscore
+}
+
+variant gcc43 conflicts g95 gcc44 gcc45 gcc46 gcc47 gcc48 universal description {build with gfortran 4.3} {
+    configure.args-delete   --disable-fortran --enable-shared
+    depends_lib-append      path:lib/libgcc/libgcc_s.1.dylib:libgcc
+    depends_build-append    port:gcc43
+    configure.f77           ${prefix}/bin/gfortran-mp-4.3
+}
+
+variant gcc44 conflicts g95 gcc43 gcc45 gcc46 gcc47 gcc48 universal description {build with gfortran 4.4} {
+    configure.args-delete   --disable-fortran --enable-shared
+    depends_lib-append      path:lib/libgcc/libgcc_s.1.dylib:libgcc
+    depends_build-append    port:gcc44
+    configure.f77           ${prefix}/bin/gfortran-mp-4.4
+}
+
+variant gcc45 conflicts g95 gcc43 gcc44 gcc46 gcc47 gcc48 universal description {build with gfortran 4.5} {
+    configure.args-delete   --disable-fortran --enable-shared
+    depends_lib-append      path:lib/libgcc/libgcc_s.1.dylib:libgcc
+    depends_build-append    port:gcc45
+    configure.f77           ${prefix}/bin/gfortran-mp-4.5
+}
+
+variant gcc46 conflicts g95 gcc43 gcc44 gcc45 gcc47 gcc48 universal description {build with gfortran 4.6} {
+    configure.args-delete   --disable-fortran --enable-shared
+    depends_lib-append      path:lib/libgcc/libgcc_s.1.dylib:libgcc
+    depends_build-append    port:gcc46
+    configure.f77           ${prefix}/bin/gfortran-mp-4.6
+}
+
+variant gcc47 conflicts g95 gcc43 gcc44 gcc45 gcc46 gcc48 universal description {build with gfortran 4.7} {
+    configure.args-delete   --disable-fortran --enable-shared
+    depends_lib-append      path:lib/libgcc/libgcc_s.1.dylib:libgcc
+    depends_build-append    port:gcc47
+    configure.f77           ${prefix}/bin/gfortran-mp-4.7
+}
+
+variant gcc48 conflicts g95 gcc43 gcc44 gcc45 gcc46 gcc47 universal description {build with gfortran 4.8} {
+    configure.args-delete   --disable-fortran --enable-shared
+    depends_lib-append      path:lib/libgcc/libgcc_s.1.dylib:libgcc
+    depends_build-append    port:gcc48
+    configure.f77           ${prefix}/bin/gfortran-mp-4.8
+}
+
+variant szip description {build with szip} {
+    depends_lib-append      port:szip
+    configure.args-delete   --without-szlib
+    configure.args-append   --with-szlib=${prefix}
+}
+
+livecheck.type   regex
+livecheck.url    ${homepage}
+livecheck.regex  {Release of HDF is ([0-9]+\.[0-9]+\.[0-9]+)}

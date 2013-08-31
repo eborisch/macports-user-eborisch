@@ -1,0 +1,34 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+# $Id$
+
+PortSystem              1.0
+PortGroup               python 1.0
+PortGroup               github 1.0
+
+github.setup            twilio flask-restful 0.2.4
+checksums               rmd160  6106945173cb75fe9ebad62aa4298f2da9b19b36 \
+                        sha256  3c8cd37166b90396e12bc5be6fd519f364286b2d840670d4439bec945bee7779
+
+name                    py-flask-restful
+set real_name           Flask-Restful
+python.versions         25 26 27
+python.default_version  27
+categories-append       www
+maintainers             cal openmaintainer
+description             Flask extension for quickly building REST APIs.
+long_description        \
+    Flask-RESTful is an extension for Flask that adds support for quickly \
+    building REST APIs. It is a lightweight abstraction that works with your \
+    existing ORM/libraries.
+
+license                 BSD
+platforms               darwin
+homepage                http://flask-restful.readthedocs.org/en/latest/
+
+if {$name != $subport} {
+    depends_build-append    port:py${python.version}-setuptools
+    depends_lib-append      port:py${python.version}-flask \
+                            port:py${python.version}-mock
+
+    livecheck.type          none
+}

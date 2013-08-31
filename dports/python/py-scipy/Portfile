@@ -1,0 +1,161 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+# $Id$
+
+PortSystem              1.0
+PortGroup               python 1.0
+
+name                    py-scipy
+version                 0.12.0
+revision                3
+platforms               darwin
+license                 BSD
+maintainers             sean openmaintainer
+description             An opensource library of scientific tools for Python
+long_description        ${description}
+
+homepage                http://www.scipy.org/
+master_sites            sourceforge:project/scipy/scipy/${version}/
+distname                scipy-${version}
+
+checksums               rmd160  35f3177dbcc37e0984fc852abf23ea0aab348ee0 \
+                        sha256  b967e802dafe2db043cfbdf0043e1312f9ce9c1386863e1c801a08ddfccf9de6
+
+if {${python.version} >= 26} {
+# Stealth update for 0.12.0 (see http://projects.scipy.org/scipy/ticket/1888)
+dist_subdir             ${name}/${version}_1
+}
+
+python.versions         24 25 26 27 31 32 33
+
+python.add_archflags    no
+universal_variant       no
+
+subport py24-scipy {
+    # scipy dropped support for Python 2.4 at version 0.12.0
+    version                 0.11.0
+    revision                2
+    master_sites            sourceforge:project/scipy/scipy/${version}/
+    distname                scipy-${version}
+    checksums               rmd160 68c0d13088d898e96c3a7ea4e77f8fc9b49e6c78 \
+                            sha256 b2b74d56a2d58a4f032f91e8b91b1c2272d5eb0b5010082dd1e492e452f862ee
+}
+
+subport py25-scipy {
+    # scipy dropped support for Python 2.5 at version 0.12.0
+    version                 0.11.0
+    revision                2
+    master_sites            sourceforge:project/scipy/scipy/${version}/
+    distname                scipy-${version}
+    checksums               rmd160 68c0d13088d898e96c3a7ea4e77f8fc9b49e6c78 \
+                            sha256 b2b74d56a2d58a4f032f91e8b91b1c2272d5eb0b5010082dd1e492e452f862ee
+}
+
+if {$subport != $name} {
+    depends_lib-append      port:py${python.version}-numpy \
+                            port:py${python.version}-nose \
+                            port:SuiteSparse \
+                            port:swig-python
+
+    worksrcdir              ${distname}
+
+    build.env-append        CCFLAGS="-I${prefix}/include -L${prefix}/lib"
+    destroot.env-append     CCFLAGS="-I${prefix}/include -L${prefix}/lib"
+
+    if {[string match "*clang*" ${configure.compiler}]} {
+        build.env-append    FFLAGS="-ff2c"
+        destroot.env-append FFLAGS="-ff2c"
+    }
+
+    patchfiles              umfpack_extra_libs.patch
+
+    post-patch {
+        reinplace "s|@@MP_PREFIX@@|${prefix}|g" ${worksrcpath}/site.cfg
+        reinplace "s|vecLib|Accelerate|g" ${worksrcpath}/scipy/lib/blas/fblaswrap_veclib_c.c.src
+        reinplace "s|vecLib|Accelerate|g" ${worksrcpath}/scipy/linalg/src/fblaswrap_veclib_c.c
+        reinplace "s|vecLib|Accelerate|g" ${worksrcpath}/scipy/sparse/linalg/eigen/arpack/ARPACK/FWRAPPERS/veclib_cabi_c.c
+        reinplace "s|vecLib|Accelerate|g" ${worksrcpath}/scipy/sparse/linalg/isolve/iterative/FWRAPPERS/veclib_cabi_c.c
+    }
+
+    variant atlas description "Use MacPorts ATLAS libraries" {
+        depends_lib-append  port:atlas
+
+        build.env-append    ATLAS=${prefix}/lib \
+                            LAPACK=${prefix}/lib \
+                            BLAS=${prefix}/lib
+
+        destroot.env-append ATLAS=${prefix}/lib \
+                            LAPACK=${prefix}/lib \
+                            BLAS=${prefix}/lib
+    }
+
+    set gcc_versions {4.3 4.4 4.5 4.6 4.7 4.8 4.9}
+    set default_fortran_variant +gcc48
+
+    foreach ver ${gcc_versions} {
+        set ver_no_dot [join [split ${ver} "."] ""]
+
+        set variant_line {variant gcc${ver_no_dot} description "build with gfortran from gcc${ver_no_dot}"}
+
+        foreach over ${gcc_versions} {
+            if {${ver} == ${over}} {
+                continue
+            }
+
+            set over_no_dot [join [split ${over} "."] ""]
+            append variant_line " conflicts gcc${over_no_dot}"
+        }
+        append variant_line { {}}
+
+        eval $variant_line
+
+        if {[variant_isset gcc${ver_no_dot}]} {
+            if {${default_fortran_variant} != "+gcc${ver_no_dot}"} {
+                set default_fortran_variant ""
+            }
+        }
+    }
+
+    if {${default_fortran_variant} != ""} {
+        default_variants-append "${default_fortran_variant}"
+    }
+
+    foreach ver ${gcc_versions} {
+        set ver_no_dot [join [split ${ver} "."] ""]
+
+        if {[variant_isset gcc${ver_no_dot}]} {
+            depends_lib-append path:lib/libgcc/libgcc_s.1.dylib:libgcc
+            depends_build-append port:gcc${ver_no_dot}
+
+            configure.fc  ${prefix}/bin/gfortran-mp-${ver}
+            configure.f77 ${prefix}/bin/gfortran-mp-${ver}
+            configure.f90 ${prefix}/bin/gfortran-mp-${ver}
+        }
+    }
+
+    set fc_options      "config_fc --fcompiler gnu95 --f77exec ${configure.f77} --f90exec ${configure.f90}"
+    set config_options  "config --cc ${configure.cc} --include-dirs ${prefix}/include --library-dirs ${prefix}/lib"
+    build.cmd-append    ${fc_options} ${config_options}
+    destroot.cmd-append ${fc_options} ${config_options}
+
+    build.env-append    CC="${configure.cc}" \
+                        CXX="${configure.cxx}"
+    destroot.env-append CC="${configure.cc}" \
+                        CXX="${configure.cxx}"
+
+    livecheck.type          none
+} else {
+    livecheck.type          regex
+    livecheck.url           http://sourceforge.net/api/file/index/project-name/scipy/rss
+    livecheck.regex         "scipy\/(\\d+(?:\\.\\d+)*)\]"
+}
+
+subport py32-scipy {
+    pre-activate {
+        set regref [registry_open $subport $version $revision $portvariants ""]
+        foreach f [registry_prop_retr $regref imagefiles] {
+            if {[file extension $f] == ".pyc" && [file exists $f] && [registry_file_registered $f] == "0"} {
+                file delete -force $f
+            }
+        }
+    }
+}

@@ -1,0 +1,100 @@
+# $Id$
+
+PortSystem 1.0
+PortGroup select 1.0
+
+name            scala2.10
+version         2.10.2
+set branch      [join [lrange [split ${version} .] 0 1] .]
+categories      lang java
+license         BSD
+maintainers     openmaintainer blair
+description     The Scala Programming Language
+long_description \
+                Scala is a modern multi-paradigm programming language \
+                designed to express common programming patterns in a \
+                concise, elegant, and type-safe way.  It smoothly \
+                integrates features of object-oriented and functional \
+                languages.  It runs inside a Java Virtual Machine and \
+                is fully interoperable with Java.
+homepage        http://www.scala-lang.org/
+platforms       darwin
+supported_archs noarch
+
+master_sites    ${homepage}downloads/distrib/files/
+
+use_configure   no
+build           {}
+
+set sharedir     ${destroot}${prefix}/share
+set docdir       ${sharedir}/doc
+set docscaladir  ${docdir}/scala-${branch}
+
+if {$subport == $name} {
+    depends_lib     port:scala_select
+    select.group    scala
+    select.file     ${filespath}/${name}
+
+    distname        scala-${version}
+    extract.suffix  .tgz
+    checksums       md5     e1466a5cbd7dd5e13b54dc7fc57dbdd1 \
+                    sha1    86b4e38703d511ccf045e261a0e04f6e59e3c926 \
+                    sha256  f693fdbc4944a40a080866593c70c14253fca2f553a0c50a26c8c52c489666a3
+
+    destroot {
+        set man1dir ${sharedir}/man/man1
+        set scaladir ${sharedir}/scala-${branch}
+        set bindir ${scaladir}/bin
+
+        xinstall -d -m 755 ${sharedir}
+        file copy ${worksrcpath} ${scaladir}
+
+        foreach f {fsc scala scalac scaladoc scalap} {
+            file attributes ${bindir}/${f} -permissions 0755
+            ln -s ../share/scala-${branch}/bin/${f} \
+                ${destroot}${prefix}/bin/${f}-${branch}
+        }
+
+        file delete ${man1dir}
+        file rename ${scaladir}/man/man1 ${man1dir}
+        foreach f {fsc scala scalac scaladoc scalap} {
+            file rename ${man1dir}/${f}.1 ${man1dir}/${f}-${branch}.1
+        }
+        file delete -force ${scaladir}/man
+
+        xinstall -d -m 755 ${docdir}
+        file rename ${scaladir}/doc ${docscaladir}
+
+        xinstall -d -m 755 ${sharedir}/java
+        foreach f {akka-actors.jar
+                   diffutils.jar
+                   scala-actors.jar
+                   scala-actors-migration.jar
+                   scala-compiler.jar
+                   scala-library.jar
+                   scala-partest.jar
+                   scala-partest-javaagent.jar
+                   scala-reflect.jar
+                   scala-swing.jar
+                   scalap.jar} {
+            set g [strsed ${f} "/.jar/-${branch}.jar/"]
+            ln -s ../scala-${branch}/lib/${f} ${sharedir}/java/${g}
+        }
+    }
+}
+
+subport ${name}-docs {
+    description     The Scala Programming Language API docs
+
+    distname        scala-docs-${version}
+    use_xz          yes
+    extract.suffix  .txz
+    checksums       md5     c580980ffe37988de453a83c083aa7d6 \
+                    sha1    b119a5c3a524fcd5e78f10af0818fd8119d13932 \
+                    sha256  5b854f16c9492291d2d9cce3dc1b9834bd1e1b5a9fb8fba5db06d75f767027c6
+
+    destroot {
+        xinstall -d -m 755 ${docscaladir}
+        file copy ${worksrcpath} ${docscaladir}/api
+    }
+}

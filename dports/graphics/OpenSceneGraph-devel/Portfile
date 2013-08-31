@@ -1,0 +1,70 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+# $Id$
+
+PortSystem              1.0
+PortGroup               cmake 1.0
+
+name                    OpenSceneGraph-devel
+conflicts               OpenSceneGraph
+set my_name             OpenSceneGraph
+version                 3.1.7
+revision                1
+platforms               darwin
+categories              graphics
+maintainers             nomaintainer
+license                 wxWidgets-3
+description             high-performance 3D graphics toolkit
+
+long_description        ${name} is a high-performance 3D graphics toolkit useful in fields such as \
+                        visual simulation, games, virtual reality, scientific visualization and \
+                        modelling.
+
+homepage                http://www.openscenegraph.org/
+master_sites            ${homepage}downloads/developer_releases/
+distname                ${my_name}-${version}
+
+use_zip                 yes
+
+checksums               rmd160  04141b4b6791d39ac72dca8034f8d62ec4e2f8cc \
+                        sha256  3d859b496a6b7a6c165388c8a1d503e175a79e90993bc15f4a8a35898c796241
+
+patchfiles              patch-CMakeLists.txt.diff
+
+post-patch {
+    set sdk_name "macosx${macosx_deployment_target}"
+    reinplace "s|@@MP_SDK_NAME@@|${sdk_name}|" ${worksrcpath}/CMakeLists.txt
+}
+
+depends_build-append    port:pkgconfig
+
+depends_lib             port:freetype \
+                        port:jasper \
+                        port:zlib \
+                        port:gdal \
+                        port:curl \
+                        port:poppler \
+                        port:librsvg \
+                        port:giflib \
+                        port:tiff \
+                        port:qt4-mac \
+                        port:boost
+
+configure.args-append   -DCMAKE_INSTALL_NAME_DIR=${prefix}/lib \
+                        -DOSG_CONFIG_HAS_BEEN_RUN_BEFORE=YES \
+                        -DOSG_DEFAULT_IMAGE_PLUGIN_FOR_OSX=imageio \
+                        -DOSG_WINDOWING_SYSTEM=Cocoa \
+                        -DDESIRED_QT_VERSION=4
+
+variant ffmpeg description {Enable FFmpeg audio/video file format support} {
+    depends_lib-append      path:lib/libavcodec.dylib:ffmpeg
+    configure.args-append   -DOSG_ENABLE_FFMPEG=YES
+}
+
+variant openexr description {Enable OpenEXR stream support} {
+    depends_lib-append      port:openexr
+    configure.args-append   -DOSG_ENABLE_OPENEXR=YES
+}
+
+livecheck.type          regex
+livecheck.url           ${homepage}downloads/developer_releases/
+livecheck.regex         ${my_name}-(\\d+(?:\\.\\d+)*)

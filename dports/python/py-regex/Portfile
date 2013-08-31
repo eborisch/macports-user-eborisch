@@ -1,0 +1,37 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; truncate-lines: t; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:et:sw=4:ts=4:sts=4
+# $Id$
+
+PortSystem          1.0
+PortGroup           python 1.0
+
+name                py-regex
+set buildver        2013-08-04
+version             0.1-[string map {"-" "" "." ""} ${buildver}]
+revision            0
+categories-append   devel
+platforms           darwin
+license             Python
+
+python.versions     26 27 31 32 33
+
+maintainers         stromnov openmaintainer
+
+description         Alternate regular expression module, to replace re.
+long_description    ${description}
+
+homepage            http://code.google.com/p/mrab-regex-hg/
+master_sites        http://pypi.python.org/packages/source/r/regex/
+
+distname            regex-${buildver}
+
+checksums           rmd160  663f29ec2e73f3ce8f52fe64f927f02b277fc27e \
+                    sha256  18e0a3b03cbfd2997d294e9b139d12ded4e2d077f63e9e8ca0eb1b38959b45e2
+
+if {$subport != $name} {
+    livecheck.type      none
+} else {
+    livecheck.type      regex
+    livecheck.url       ${master_sites}
+    livecheck.version   ${buildver}
+    livecheck.regex     "regex-(\\d+(?:\\-\\d+)*)${extract.suffix}"
+}

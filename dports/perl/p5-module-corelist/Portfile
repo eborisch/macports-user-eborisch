@@ -1,0 +1,22 @@
+# $Id$
+
+PortSystem          1.0
+PortGroup           perl5 1.0
+
+perl5.branches      5.8 5.10 5.12 5.14 5.16
+perl5.setup         Module-CoreList 2.92 ../by-authors/id/B/BI/BINGOS/
+license             {Artistic GPL}
+maintainers         nomaintainer
+description         what modules shipped with versions of perl
+long_description    Module::CoreList contains the hash of hashes \
+                    %Module::CoreList::version, that is keyed on perl \
+                    version as indicated in \$].
+
+platforms           darwin
+
+checksums           rmd160  b20ced3803f0a7e5a2c29fe4d89b02675cb23822 \
+                    sha256  493776226d7a35a5619de1b79a2a65165779802195fb537864a3599b29871035
+
+supported_archs     noarch
+
+perl5.link_binaries no

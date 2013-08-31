@@ -1,0 +1,44 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+# $Id$
+
+PortSystem          1.0
+PortGroup           haskell 1.0
+
+haskell.setup       pandoc 1.11.1
+revision            4
+name                pandoc
+categories          textproc
+platforms           darwin
+license             GPL-3
+maintainers         nomaintainer
+
+description         Conversion between markup formats
+long_description    \
+    Pandoc is a Haskell library for converting from one markup format to \
+    another, and a command-line tool that uses this library. It can read \
+    markdown and (subsets of) HTML, reStructuredText, LaTeX, DocBook, MediaWiki \
+    markup, and Textile, and it can write markdown, reStructuredText, HTML, \
+    LaTeX, ConTeXt, Docbook, OpenDocument, ODT, Word docx, RTF, MediaWiki, \
+    Textile, groff man pages, plain text, Emacs Org-Mode, AsciiDoc, EPUB (v2 \
+    and v3), FictionBook2, and S5, Slidy and Slideous HTML slide shows.
+
+checksums           rmd160  9189e500cd3f75e8d16124d33104feddc14107f3 \
+                    sha256  ebb090b08b5439d719d1d01575aa91262035cb9b8de61ffaf49a853a5fde432c
+
+depends_lib-append  port:hs-extensible-exceptions \
+                    port:hs-base64-bytestring \
+                    port:hs-blaze-html \
+                    port:hs-citeproc \
+                    port:hs-data-default \
+                    port:hs-highlighting-kate \
+                    port:hs-http \
+                    port:hs-pandoc-types \
+                    port:hs-random \
+                    port:hs-sha \
+                    port:hs-tagsoup-0.12 \
+                    port:hs-temporary \
+                    port:hs-texmath \
+                    port:hs-utf8-string \
+                    port:hs-zip-archive \
+
+test.run            yes

@@ -1,0 +1,56 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+# $Id$
+
+PortSystem          1.0
+PortGroup           kde4 1.1
+
+name                soprano
+version             2.9.2
+categories          devel
+maintainers         pixilla openmaintainer
+license             GPL-2+ LGPL-2+
+
+description         The Qt-based RDF framework.
+long_description    Soprano is a software library that provides an \
+                    object-oriented C++/Qt4 framework for RDF data.
+platforms           darwin
+homepage            https://projects.kde.org/projects/kdesupport/soprano
+master_sites        sourceforge:soprano
+
+use_bzip2           yes
+
+checksums           rmd160  5c3a934aabb6c0642452da7b634140b0513c5b51 \
+                    sha256  e115d2debd9b809e4c290cb8068eb9f61f2f654ee32a315f3006a8199ea5bd80
+
+depends_lib-append  port:strigi \
+                    port:raptor2 \
+                    port:redland \
+                    port:libiodbc
+
+depends_run-append  port:virtuoso
+
+patchfiles          patch-parsers-raptor-raptorparser.h.diff \
+                    patch-serializers-raptor-raptorserializer.cpp.diff
+
+configure.args-append \
+                    -DSOPRANO_DISABLE_CLUCENE_INDEX=1
+
+pre-configure {
+    if {![file isfile "/System/Library/Frameworks/JavaVM.framework/Headers/jni.h"]} {
+        ui_error "${name} requires the Java for Mac OS X development headers."
+        if {${os.major} == 11} {
+            ui_error "Download the Java Developer Package from: <http://support.apple.com/kb/DL1421>"
+        } elseif {${os.major} == 10} {
+            ui_error "Download the Java Developer Package from: <https://connect.apple.com/cgi-bin/WebObjects/MemberSite.woa/wa/getSoftware?bundleID=20719>"
+        } elseif {${os.major} == 9} {
+            ui_error "Download the Java Developer Package from: <https://connect.apple.com/cgi-bin/WebObjects/MemberSite.woa/wa/getSoftware?bundleID=20720>"
+        } else {
+            ui_error "Make sure your Xcode installation is complete."
+        }
+        return -code error "missing Java headers"
+    }
+}
+
+livecheck.type      sourceforge
+livecheck.url       http://sourceforge.net/projects/soprano/files/Soprano/
+livecheck.regex     (\\d+(\\.\\d+)+)

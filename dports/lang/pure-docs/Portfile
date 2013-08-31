@@ -1,0 +1,25 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+# $Id$
+
+PortSystem                      1.0
+PortGroup                       pure 1.0
+
+# Keep the versions of pure and pure-docs in sync.
+pure.setup                      docs 0.57
+categories                      lang
+platforms                       darwin
+maintainers                     ryandesign
+supported_archs                 noarch
+license                         GPL-3
+homepage                        http://purelang.bitbucket.org/docs/
+
+description                     documentation for the Pure programming language
+
+long_description                ${name} is an offline copy of the ${description}.
+
+checksums                       rmd160  850d56d944e6e502c1ec12f9e9c69ddee4308a02 \
+                                sha256  d40705a2d24bea1e0e139bb65bafc5d91da43c07d529b909c49d90bd7565eafa
+
+platform macosx {
+    patchfiles                  patch-openbrowser.diff
+}

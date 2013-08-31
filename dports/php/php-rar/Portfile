@@ -1,0 +1,35 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:filetype=tcl:et:sw=4:ts=4:sts=4
+# $Id$
+
+PortSystem          1.0
+PortGroup           php 1.1
+
+name                php-rar
+version             3.0.1
+categories          php devel
+platforms           darwin
+maintainers         ryandesign openmaintainer
+license             PHP-3.0
+
+php.branches        5.3 5.4 5.5
+php.pecl            yes
+
+description         A PECL extension to create and read rar files.
+
+long_description    ${description}
+
+homepage            http://www.php.net/rar
+
+checksums           rmd160  5a781957e6bfa42facc513ebc9c0a8bcd48b9d7c \
+                    sha256  422a7d2b69d0192b580759064de7d404d24b3c65c7fedc4e64e2c821e92231af
+
+patchfiles          patch-config.m4.diff
+
+if {${php.branch} == 5.5} {
+    incr revision
+    patchfiles-append patch-php55.diff
+}
+
+configure.args-append --enable-rar
+
+use_parallel_build  yes

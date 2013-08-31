@@ -1,0 +1,18 @@
+# $Id$
+
+PortSystem          1.0
+PortGroup           octave 1.0
+
+octave.setup        optim 1.2.2
+platforms           darwin
+license             GPL-2+ GPL-3+
+maintainers         nomaintainer
+description         Unconstrained Non-linear Optimization toolkit.
+long_description    ${description}
+
+depends_lib-append  port:octave-miscellaneous \
+                    port:octave-struct
+
+checksums           md5     dce5e543c47ecc71ce0e8bb37994ed5d \
+                    sha1    c1fbd588dd11150ff4e973d4b93582c8bd6126ed \
+                    rmd160  7816d2c40d948485426b1f4340e0ed32427a4abf

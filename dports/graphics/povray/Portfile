@@ -1,0 +1,122 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+# $Id$
+
+PortSystem          1.0
+PortGroup           muniversal 1.0
+
+name                povray
+version             3.7.0.RC7
+revision            1
+set branch          [join [lrange [split ${version} .] 0 1] .]
+categories          graphics
+platforms           darwin
+maintainers         nomaintainer
+
+description         Persistence Of Vision RAYtracer
+
+long_description    POVRAY is a 'free' and popular Ray Tracer available for \
+                    many platforms (including UNIX). This is a port of the \
+                    UNIX version, not the graphical Mac OS X version.
+
+homepage            http://www.povray.org/
+master_sites        ${homepage}beta/source/
+use_bzip2           yes
+
+checksums           rmd160  e75db88beb10360de917f22e182c7918f017b995 \
+                    sha256  fd2fdf8673bb20e66d77f550eca7b6052cce971731d11a1f96edd950641c09fd
+
+depends_build       port:pkgconfig
+
+depends_lib         port:boost \
+                    port:openexr \
+                    port:xorg-libsm \
+                    port:xpm \
+                    port:libpng \
+                    port:libsdl \
+                    port:jpeg \
+                    port:zlib \
+                    port:tiff
+
+# patch-shared_ptr.diff:
+#     gsed -i 's/\([ 	(]\)shared_ptr/\1boost::shared_ptr/g' "${@}"
+#     gsed -i 's/^shared_ptr/boost::shared_ptr/g' "${@}"
+
+patchfiles          patch-shared_ptr.diff
+
+configure.env       COMPILED_BY="MacPorts"
+configure.libs      -lboost_system-mt
+configure.args      --with-boost=${prefix} \
+                    --with-boost-thread \
+                    --with-libjpeg=${prefix} \
+                    --with-libpng=${prefix} \
+                    --with-libsdl=${prefix} \
+                    --with-libtiff=${prefix} \
+                    --with-openexr=${prefix} \
+                    --with-zlib=${prefix}
+
+post-destroot {
+    foreach f {povray.conf povray.ini} {
+        move ${destroot}${prefix}/etc/povray/${branch}/${f} \
+             ${destroot}${prefix}/etc/povray/${branch}/${f}.sample
+    }
+}
+
+post-activate {
+    foreach f {povray.conf povray.ini} {
+        if {![file exists ${prefix}/etc/povray/${branch}/${f}]} {
+            copy ${prefix}/etc/povray/${branch}/${f}.sample \
+                 ${prefix}/etc/povray/${branch}/${f}
+        }
+    }
+}
+
+test.run            yes
+test.target         check
+
+# Unable to cross compile, so we need to be able to run the built code
+if {${os.arch} == "i386" && ${os.major} >= 11} {
+    supported_archs i386 x86_64
+    set universal_archs_supported {i386 x86_64}
+} elseif {${os.arch} == "i386" && ${configure.build_arch} == "x86_64"} {
+    supported_archs i386 x86_64 ppc
+    set universal_archs_supported {i386 x86_64 ppc}
+} elseif {${os.arch} == "i386"} {
+    supported_archs i386 ppc
+    set universal_archs_supported {i386 ppc}
+} elseif {${configure.build_arch} == "ppc64"} {
+    supported_archs ppc ppc64
+    set universal_archs_supported {ppc ppc64}
+} else {
+    supported_archs ${configure.build_arch}
+    set universal_archs_supported ${configure.build_arch}
+}
+
+platform darwin {
+    patchfiles-append   patch-configure-stat.diff \
+                        patch-lseek64.diff \
+                        patch-vfe-uint.diff
+
+    if {${os.major} <= 10} {
+        depends_build
+        depends_lib
+        pre-fetch {
+            ui_error "${name} does not build on OS X 10.6 Snow Leopard or earlier."
+            return -code error "unsupported OS X version"
+        }
+    }
+    
+    set merger_host(x86_64) x86_64-apple-${os.platform}${os.major}
+    set merger_host(i386) i686-apple-${os.platform}${os.major}
+    set merger_host(ppc64) powerpc64-apple-${os.platform}${os.major}
+    set merger_host(ppc) powerpc-apple-${os.platform}${os.major}
+    foreach arch ${configure.universal_archs} {
+        set merger_configure_args(${arch}) --build=$merger_host(${arch})
+    }
+    if {![variant_isset universal] && [info exists merger_configure_args(${configure.build_arch})]} {
+        configure.args-append --host=$merger_host(${configure.build_arch}) $merger_configure_args(${configure.build_arch})
+    }
+}
+
+livecheck.type      regex
+livecheck.url       ${homepage}ftp/pub/povray/Official/Unix/
+livecheck.regex     {CURRENT-VERSION-IS-([0-9.]+)}

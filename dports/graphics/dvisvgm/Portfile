@@ -1,0 +1,24 @@
+# $Id$
+
+PortSystem 1.0
+
+name                dvisvgm
+version             1.4
+categories          graphics textproc
+platforms           darwin
+license             GPL-3+
+maintainers         mww openmaintainer
+description         DVI to SVG converter
+long_description    \
+    The command-line utility dvisvgm is a tool for TeX/LaTeX users. It \
+    converts DVI files to the XML-based scalable vector graphics format SVG.
+
+homepage            http://dvisvgm.sourceforge.net/
+master_sites        sourceforge
+checksums           rmd160  1309dd99c5cebc156727d1f100ebc44839c330b2 \
+                    sha256  d68b4c172e53f38e5067b5f09fb0577a13ae55658246008101e862f4ab2cf622
+
+depends_lib         port:freetype port:zlib port:potrace port:texlive-bin port:pkgconfig
+
+test.run            no
+

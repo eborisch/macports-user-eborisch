@@ -1,0 +1,36 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+# $Id$
+
+PortSystem          1.0
+PortGroup           kde4   1.1
+
+name                marble
+version             4.10.5
+categories          kde kde4
+maintainers         sharky nicos
+license             LGPL-2.1+ GFDL-1.2
+description         Virtual Globe
+long_description    KDE virtual globe and world atlas
+homepage            http://www.kde.org
+
+platforms           darwin
+
+master_sites        kde:stable/${version}/src/
+use_xz              yes
+
+checksums           rmd160  06b21e956e327be69da4817ac4ba75ef7b7b5f04 \
+                    sha256  c4ef4e1dd6aea9589e907e3ed7a81272af227f8c1b7be9dc8b152aab25009e11
+
+depends_lib-append  port:libkdeedu \
+                    port:gpsd
+
+patchfiles-append   patch-GpsdSymbols.diff
+
+if {![variant_isset docs]} {
+    patchfiles-append   patch-CMakeLists.txt.diff
+}
+
+configure.args-append   -DCMAKE_MODULES_INSTALL_PATH=${cmake_share_module_dir}
+
+livecheck.url       http://kde.mirrors.hoobly.com/stable/
+livecheck.regex     (\\d+(\\.\\d+)+)

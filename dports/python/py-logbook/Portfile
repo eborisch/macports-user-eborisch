@@ -1,0 +1,46 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+# $Id$
+
+PortSystem          1.0
+PortGroup           python 1.0
+
+name                py-logbook
+version             0.5.0
+revision            0
+categories-append   devel
+platforms           darwin
+license             BSD
+
+python.versions     26 27 32 33
+
+maintainers         stromnov openmaintainer
+
+description         Python logging replacement module.
+long_description    ${description}
+
+homepage            http://packages.python.org/Logbook/
+master_sites        http://pypi.python.org/packages/source/L/Logbook/
+
+distname            Logbook-${version}
+
+checksums           rmd160  affbf1f85346a3c1e58a21fbdd9548b4f0a91c9f \
+                    sha256  63265dcc3fed2bbd730a7aeadf8865245455145ec0f7be1b842c7c0713e72b26
+
+if {$subport == "py32-logbook"} {
+    version             0.4.2
+    revision            0
+    distname            Logbook-${version}
+    checksums           rmd160  52b76fb224b6809c0280efe0c31eb5c0c7a34182 \
+                        sha256  60a373b06d3a0700a2311f35aef296f89de96e65dc45a0b3c6c4d4033bb457bc
+}
+
+if {$subport != $name} {
+    depends_build-append \
+                        port:py${python.version}-setuptools
+
+    livecheck.type      none
+} else {
+    livecheck.type      regex
+    livecheck.url       ${master_sites}
+    livecheck.regex     {Logbook-(\d+(?:\.\d+)*)\.[tz]}
+}

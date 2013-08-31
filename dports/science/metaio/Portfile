@@ -1,0 +1,28 @@
+# $Id$
+
+PortSystem    1.0
+
+name          metaio
+version       8.3.1
+categories    science
+platforms     darwin
+maintainers   ram
+
+description   LIGO Light-Weight XML Library
+long_description \
+  This code implements a simple recursive-descent parsing scheme \
+  for LIGO_LW files, based on the example in Chapter 2 of \
+  "Compilers: Principles, Techniques and Tools" by Aho, Sethi and \
+  Ullman.
+
+homepage      https://www.lsc-group.phys.uwm.edu/daswg/projects/metaio.html
+master_sites  http://www.lsc-group.phys.uwm.edu/daswg/download/software/source/
+
+checksums     rmd160 d984948f684a19303cc657ade61945c5ce7e55c7 \
+              sha256 3e9ab83a0f890babaa39fe9ede01bf46cfbab5726a41e8fd3717f5a3d3822d67
+
+depends_lib   port:zlib
+
+livecheck.type  regex
+livecheck.url   ${master_sites}
+livecheck.regex {metaio-(\d+(?:\.\d+)*).tar.gz}

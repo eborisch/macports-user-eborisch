@@ -1,0 +1,35 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+# $Id$
+
+PortSystem          1.0
+PortGroup           kde4   1.1
+
+name                kjumpingcube
+version             4.10.5
+categories          kde kde4 games
+license             GPL-2+
+maintainers         nicos openmaintainer
+description         KJumpingcube is a simple dice driven tactical game. 
+long_description    ${description} The playing area consists of squares containing \
+                    points. Players move by clicking on either a vacant square, or \
+                    on own square.
+platforms           darwin
+homepage            http://games.kde.org/game.php?game=kjumpingcube
+master_sites        kde:stable/${version}/src
+use_xz              yes
+distname            ${name}-${version}
+checksums           rmd160  9a506900db82023d99ff1abbf66a3952c8f1af88 \
+                    sha256  599f4da9bc03c2f83feb5063a862a15e965045276f360278af698b83357e37f9
+
+#Binaries do not link to openssl, nor use the ssl backend of kdelibs4
+license_noconflict  openssl
+
+depends_lib-append  port:kdelibs4 \
+                    port:libkdegames
+
+if {![variant_isset docs]} {
+    patchfiles      patch-CMakeLists.diff
+}
+
+livecheck.url       http://kde.mirrors.hoobly.com/stable/
+livecheck.regex     (\\d+(\\.\\d+)+)

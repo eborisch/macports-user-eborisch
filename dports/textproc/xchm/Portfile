@@ -1,0 +1,37 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+# $Id$
+
+PortSystem          1.0
+PortGroup           app 1.0
+PortGroup           wxWidgets 1.0
+
+name                xchm
+git.branch          7fa3f2dddc3b0baf5b17b6432a33f4be494b02da
+version             1.23_20130828_${git.branch} 
+categories          textproc
+maintainers         mojca openmaintainer
+platforms           darwin
+
+description         A cross-platform GUI front-end to chmlib.
+long_description    A cross-platform GUI front-end to chmlib, xCHM can \
+                    show the content tree if one is available, print pages, \
+                    change font face and size, remember bookmarks, display \
+                    a searchable index, and search for words in the current \
+                    page and the whole book.
+
+homepage            http://xchm.sourceforge.net/
+
+fetch.type          git
+git.url             git://git.code.sf.net/p/xchm/code
+
+app.name            xCHM
+app.executable      xchm
+app.icon            ${worksrcpath}/art/xchm-128.png
+
+wxWidgets.use       wxWidgets-3.0
+
+depends_build       port:makeicns
+depends_lib         port:chmlib \
+                    port:${wxWidgets.port}
+
+configure.args      --with-wxdir=${wxWidgets.wxdir}

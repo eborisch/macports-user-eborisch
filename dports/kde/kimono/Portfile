@@ -1,0 +1,38 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+# $Id$
+
+PortSystem          1.0
+PortGroup           kde4   1.1
+
+name                kimono
+version             4.10.5
+categories          kde kde4 devel
+platforms           darwin
+license             GPL-2+ LGPL-2.1+
+maintainers         nicos openmaintainer
+
+description         C# binding for KDE.
+long_description    ${description}
+
+homepage            http://techbase.kde.org/Development/Languages
+master_sites        kde:stable/${version}/src/
+distname            ${name}-${version}
+use_xz              yes
+
+checksums           rmd160  fc0241d49936d891a3c9b24866bd90ff9752432a \
+                    sha256  e03548bd35a155be1d2a47739d20c2259be16f3c89ce9981ebd9142ca75f5c73
+
+#Binaries do not link directly to openssl, nor use the ssl backend of kdelibs4,
+#nor links to libkimap or libmailtransport from kdepimlibs4
+license_noconflict  openssl
+
+#Suppress link to deprecated index library of soprano
+patchfiles          patch-CMakeLists-soprano.diff
+
+depends_lib-append  port:kdelibs4 \
+                    port:kdepimlibs4 \
+                    port:mono \
+                    port:qyoto
+
+livecheck.url       http://kde.mirrors.hoobly.com/stable/
+livecheck.regex     (\\d+(\\.\\d+)+)

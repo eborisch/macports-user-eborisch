@@ -1,0 +1,34 @@
+# $Id$
+
+PortSystem       1.0
+
+name             cgminer
+version          3.3.4
+categories       finance
+platforms        darwin
+maintainers      ram openmaintainer
+license          GPL-3
+
+description      ASIC/FPGA/GPU miner in c for bitcoin and litecoin
+long_description \
+  This is a multi-threaded multi-pool GPU, FPGA and ASIC miner with \
+  ATI GPU monitoring, (over)clocking and fanspeed support for bitcoin \
+  and derivative coins.
+
+homepage         https://github.com/ckolivas/cgminer
+master_sites     http://ck.kolivas.org/apps/cgminer
+use_bzip2        yes
+
+checksums        rmd160 ce1acc7baed9777bc08e13792fff650b7f7d4b16 \
+                 sha256 30f665144f4f4ddec1b2a8b2b5c90339a2f4a213e636c1a8049ee1a77d6e6475
+
+depends_build    port:pkgconfig \
+                 port:gawk
+
+depends_lib      port:ncurses \
+                 port:curl \
+                 port:jansson
+
+livecheck.type   regex
+livecheck.url    ${master_sites}
+livecheck.regex  {cgminer-(\d+(?:\.\d+)*).tar.bz2}

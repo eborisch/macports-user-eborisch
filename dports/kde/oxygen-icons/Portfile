@@ -1,0 +1,24 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+# $Id$
+
+PortSystem          1.0
+PortGroup           kde4   1.1
+
+name                oxygen-icons
+version             4.10.5
+categories          kde kde4
+maintainers         sharky nicos
+license             LGPL-3+
+description         Oxygen icon theme
+long_description    The standard icon theme for KDE4.
+platforms           darwin
+homepage            http://www.kde.org
+master_sites        kde:stable/${version}/src/
+use_xz              yes
+checksums           rmd160  ef19cc1b753f5d025a635361bfd39fa9167b32f7 \
+                    sha256  cae327568f5382eebc3257326776fb4a2b0ab5cdd7b78e9cacd347efcec1f1f8
+
+supported_archs     noarch
+
+livecheck.url       http://kde.mirrors.hoobly.com/stable/
+livecheck.regex     (\\d+(\\.\\d+)+)

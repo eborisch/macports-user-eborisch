@@ -1,0 +1,33 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+# $Id$
+
+PortSystem          1.0
+PortGroup           python 1.0
+PortGroup           github 1.0
+
+github.setup        paramiko paramiko 1.11.0 v
+
+name                py-paramiko
+categories-append   net security
+platforms           darwin
+license             LGPL-2.1+
+supported_archs     noarch
+
+python.versions     24 25 26 27
+
+maintainers         nomaintainer
+
+description         python library for making SSH2 connections
+long_description    This is a library for making SSH2 connections (client \
+    or server). Emphasis is on using SSH2 as an alternative to SSL for \
+    making secure connections between python scripts. All major ciphers \
+    and hash methods are supported. SFTP client and server mode are both \
+    supported too.
+
+checksums           rmd160  ae45c6fec0de43ec27dace3771d344b41f114c2e \
+                    sha256  7e97a2e6f559b6335c726972a4a276ce8690271d8ccf58978b237366b60d21c9
+
+if {$subport != $name} {
+    depends_lib-append  port:py${python.version}-crypto
+    livecheck.type      none
+}

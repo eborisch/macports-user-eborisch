@@ -1,0 +1,36 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+# $Id$
+
+PortSystem              1.0
+PortGroup               php5extension 1.0
+
+php5extension.setup     xcache 3.0.3
+categories-append       www
+platforms               darwin
+maintainers             ryandesign openmaintainer
+license                 BSD
+
+homepage                http://xcache.lighttpd.net/
+master_sites            ${homepage}pub/Releases/${version}/
+use_bzip2               yes
+conflicts               php5-apc php5-eaccelerator
+
+description             fast, stable PHP opcode cacher
+
+long_description        ${name} is a ${description}.
+
+checksums               rmd160  e223bcf42e4dbec57e37b4b5cbaece1014831fbc \
+                        sha256  2ff6809e66d9c14b70570b9b602ba8ea1daa87bc4a67f59fa769b1d0a6981edc
+
+patchfiles              patch-xcache.ini.diff
+
+# gcc-4.2: -E, -S, -save-temps and -M options are not allowed with multiple -arch flags
+universal_variant       no
+
+post-destroot {
+    set docdir ${destroot}${prefix}/share/doc/${name}
+    xinstall -d ${docdir}
+    xinstall -W ${worksrcpath} -m 644 AUTHORS COPYING ChangeLog NEWS README THANKS xcache.ini ${docdir}
+}
+
+livecheck.name          xcache

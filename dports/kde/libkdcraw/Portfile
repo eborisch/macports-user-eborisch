@@ -1,0 +1,32 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+# $Id$
+
+PortSystem          1.0
+PortGroup           kde4   1.1
+PortGroup           muniversal 1.0
+
+name                libkdcraw
+version             4.10.5
+categories          kde kde4
+license             GPL-2+ LGPL-2+
+maintainers         nicos openmaintainer
+description         LibKDcraw is a C++ interface around LibRaw library used to decode RAW picture files.
+long_description    LibKDcraw is a C++ interface around LibRaw library used to decode RAW picture files. \
+                    This library is used by kipi-plugins, digiKam and others kipi host programs.
+platforms           darwin
+homepage            http://www.kde.org
+master_sites        kde:stable/${version}/src/
+use_xz              yes
+distname            libkdcraw-${version}
+checksums           rmd160  51baef1e256477f2eccfb2a9861194aa60b383dd \
+                    sha256  cad35e13ea44c4e0bf0932bfb0aae951e24ec957b06737057ad9dc0b735b3c5c
+
+#Binaries do not link to openssl, nor use the ssl backend of kdelibs4
+license_noconflict  openssl
+
+depends_lib-append  port:kdelibs4 \
+                    port:jpeg \
+                    port:lcms
+
+livecheck.url       http://kde.mirrors.hoobly.com/stable/
+livecheck.regex     (\\d+(\\.\\d+)+)

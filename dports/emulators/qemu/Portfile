@@ -1,0 +1,97 @@
+# $Id$
+
+PortSystem 1.0
+
+name                    qemu
+version                 1.6.0
+categories              emulators
+license                 GPL-2+
+platforms               darwin
+maintainers             raimue openmaintainer
+
+description             Emulator for various architectures
+long_description        QEMU is a generic and open source machine emulator. \
+                        It can run OSes and programs made for one machine on a \
+                        different machine. By using dynamic translation, it \
+                        achieves very good performance.
+
+homepage                http://qemu.org
+master_sites            ${homepage}/download
+use_bzip2 yes
+
+checksums               rmd160  e9cd36df6cba757a37dd34b7889f3190e7b6f222 \
+                        sha256  3132e58ada26d43b6924e8c2f07db80aa1e5022f3dcf03dee7d8bb9194b2cb48
+
+patchfiles              patch-configure.diff
+
+depends_build           port:texinfo \
+                        port:libtool \
+                        port:pkgconfig \
+                        port:python27
+
+depends_lib             port:curl \
+                        port:cyrus-sasl2 \
+                        path:lib/pkgconfig/glib-2.0.pc:glib2 \
+                        port:gnutls \
+                        port:libidn \
+                        port:libtasn1 \
+                        port:ncurses \
+                        port:libpng \
+                        port:jpeg \
+                        port:ossp-uuid \
+                        path:lib/pkgconfig/pixman-1.pc:libpixman
+
+# see #39058
+compiler.blacklist      gcc-4.0 gcc-3.3 apple-gcc-4.0
+
+configure.args          --cpu=${configure.build_arch} \
+                        --cc=${configure.cc} \
+                        --objcc=${configure.objc} \
+                        --host-cc=${configure.cc} \
+                        --python=${prefix}/bin/python2.7
+
+# Ensure to not accidentally select the GTK interface
+configure.args-append   --disable-gtk
+
+# libtool: unknown option character `-' in: --mode=compile
+configure.env-append   LIBTOOL=${prefix}/bin/glibtool
+
+set target_list {}
+pre-configure {
+    configure.args-append --target-list=${target_list}
+}
+
+# disable silent rules
+build.args-append       V=1
+
+foreach t {i386 x86_64 alpha arm cris lm32 m68k {microblaze microblazeel} {mips mipsel mips64 mips64el} \
+           or32 {ppc ppcemb ppc64} {sh4 sh4eb} {sparc sparc64} s390x {xtensa xtensaeb} unicore32} {
+    variant target_[lindex $t 0] description "Add target support for [join $t {, }]" "append target_list \",[join $t -softmmu,]-softmmu\""
+}
+default_variants    +target_i386 +target_x86_64
+
+# XXX: GTK interface does not work on Mac OS X yet
+#variant gtk2 description {Build GTK+ GUI for GTK+ 2} {
+#    depends_lib-append     port:gtk2 port:vte
+#    configure.args-replace --disable-gtk --enable-gtk
+#    configure.args-append  --with-gtkabi=2.0
+#}
+#
+## Disabled for now, requires vte >= 0.30 / pkg-config package vte-2.90
+##variant gtk3 description {Build GTK+ GUI for GTK+ 3} {
+##    depends_lib-append     port:gtk3
+##    configure.args-replace --disable-gtk --enable-gtk
+##    configure.args-append --with-gtkabi=3.0
+##}
+
+# Default universal variant does not work
+universal_variant       no
+
+platform darwin 8 {
+    depends_build-append port:gmake
+    build.cmd ${prefix}/bin/gmake
+}
+
+livecheck.type  regex
+livecheck.url   [lindex ${master_sites} 0]
+livecheck.regex ${name}-(\\d+(?:\\.\\d+)*)(?:-\\d+)*\\.tar

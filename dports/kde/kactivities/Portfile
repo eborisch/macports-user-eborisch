@@ -1,0 +1,28 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+# $Id$
+
+PortSystem          1.0
+PortGroup           kde4   1.1
+
+name                kactivities
+version             4.10.5
+categories          kde kde4
+maintainers         nicos openmaintainer
+license             GPL-2+ LGPL-2+ GFDL-1.2
+description         Kactivities
+long_description    ${description}
+platforms      	    darwin
+homepage            http://www.kde.org
+master_sites        kde:stable/${version}/src/
+use_xz              yes
+distname            ${name}-${version}
+checksums           rmd160  6a6d2deb973f5beddc01b3fb6296dadad416e155 \
+                    sha256  4fc0d2a2e216d5aaa438c5d3685f9cb1e09bcc76486ca3bfb84e6e06f860cb69
+
+#Binaries do not link to openssl, nor use the ssl backend of kdelibs4
+license_noconflict  openssl
+
+depends_lib-append  port:kdelibs4
+
+livecheck.url       http://kde.mirrors.hoobly.com/stable/
+livecheck.regex     (\\d+(\\.\\d+)+)

@@ -1,0 +1,75 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+# $Id$
+
+PortSystem          1.0
+
+name                eda
+version             0.2.0
+categories          textproc japanese
+maintainers         hum openmaintainer
+
+description         a word-based dependency parser written in C++
+long_description    EDA is ${description}.
+
+homepage            http://plata.ar.media.kyoto-u.ac.jp/tool/EDA/
+platforms           darwin
+license             BSD
+
+master_sites        ${homepage}downloads/
+checksums           rmd160  1a08c2d30aba0afafd83605c8731578f60ecb702 \
+                    sha256  7bc24b45beaabdabe0fc4165db935fba56bef5b7de8f4de846d058fc1561919c
+
+depends_lib         port:boost \
+                    port:zlib
+
+depends_run         port:kytea
+
+use_configure       no
+
+variant universal   {}
+
+compiler.blacklist  clang
+
+set cxxflags        "${configure.cxxflags} [get_canonical_archflags cxx]"
+set cppflags        "-I../lib/soplib ${configure.cppflags}"
+set ldflags         "${configure.ldflags} -lz"
+build.args          CXX="${configure.cxx}" \
+                    CXXFLAGS="${cxxflags} ${cppflags} ${ldflags}"
+
+destroot {
+    # install binaries.
+    xinstall -m 755 -W ${worksrcpath}/src/eda \
+        eda train-eda \
+        ${destroot}${prefix}/bin
+    # install a demo script.
+    xinstall -m 755 ${filespath}/eda_demo ${destroot}${prefix}/bin
+    reinplace "s|@prefix@|${prefix}|g" ${destroot}${prefix}/bin/eda_demo
+    # install models.
+    set models_dir ${destroot}${prefix}/lib/${name}/models
+    xinstall -d ${models_dir}
+    xinstall -m 644 -W ${worksrcpath}/data \
+        jp-0.1.0-utf8-vocab-small.dat  \
+        jp-0.1.0-utf8-weight-small.dat \
+        ${models_dir}
+    # install additional documents.
+    set doc_dir ${destroot}${prefix}/share/doc/${name}
+    xinstall -d ${doc_dir}
+    xinstall -m 644 -W ${worksrcpath} \
+        COPYING README \
+        ${doc_dir}
+    # install scripts.
+    set scripts_dir ${destroot}${prefix}/share/${name}/scripts
+    xinstall -d ${scripts_dir}
+    xinstall -m 755 -W ${worksrcpath} \
+        eval.pl \
+        ${scripts_dir}
+    # install sample data.
+    set sample_dir ${destroot}${prefix}/share/${name}/sample
+    xinstall -d ${sample_dir}
+    xinstall -m 644 -W ${worksrcpath}/data \
+        sample.tree sample.txt sample_test.tree \
+        ${sample_dir}
+}
+
+livecheck.type      regex
+livecheck.regex     ${name}-(\[0-9.\]+)\\.

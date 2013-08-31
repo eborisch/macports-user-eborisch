@@ -1,0 +1,39 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+# $Id$
+
+PortSystem          1.0
+PortGroup           python 1.0
+
+name                py-mahotas
+version             1.0.2
+revision            0
+platforms           darwin
+license             MIT
+
+python.versions     26 27 32 33
+
+maintainers         stromnov openmaintainer
+
+description         Set of functions for image processing and computer vision in Python
+long_description    ${description}
+
+homepage            http://luispedro.org/software/mahotas/
+master_sites        http://pypi.python.org/packages/source/m/mahotas/
+
+distname            mahotas-${version}
+
+checksums           rmd160  651dd710b0694a1fe6c3f5f3a3001cf4e5b7758f \
+                    sha256  b7642c7c228b788e6d8790e6d73eb6950c73585d434d62337dda456cfaeb1ecd
+
+if {$subport != $name} {
+    depends_build-append    port:py${python.version}-setuptools
+
+    depends_lib-append      port:py${python.version}-numpy \
+                            port:freeimage
+
+    livecheck.type          none
+} else {
+    livecheck.type          regex
+    livecheck.url           ${master_sites}
+    livecheck.regex         "mahotas-(\\d+(?:\\.\\d+)*)${extract.suffix}"
+}

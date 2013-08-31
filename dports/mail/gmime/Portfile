@@ -1,0 +1,47 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+# $Id$
+
+PortSystem      1.0
+
+name            gmime
+version         2.6.17
+set branch      [join [lrange [split ${version} .] 0 1] .]
+
+description     MIME mail utilities
+long_description  The GMime suite provides a core library and set of utilities \
+                  which may be used for the creation and parsing of messages \
+                  using the Multipurpose Internet Mail Extension (MIME) \
+                  configurable and incorporating all the features you would expect \
+                  in a robust mail client.
+maintainers     nomaintainer
+categories      mail
+license         LGPL-2.1+
+platforms       darwin
+homepage        http://spruce.sourceforge.net/gmime/
+master_sites    gnome:sources/${name}/${branch}
+
+use_xz          yes
+
+checksums       sha256  22d49e57c404a0a68d1ac3426c8f23a39185a4b2d569de03bece07db03d1202f \
+                rmd160  e86502c0fcd8dc34f8b859bbe815dec625d1d2ed
+
+depends_build   path:bin/pkg-config:pkgconfig
+depends_lib     port:libgpg-error \
+                port:gpgme \
+                port:gobject-introspection \
+                port:vala \
+                port:libiconv \
+                path:lib/pkgconfig/glib-2.0.pc:glib2 \
+                port:gettext \
+                port:zlib
+
+configure.args  --enable-introspection=yes \
+                --enable-vala=yes \
+                --enable-cryptography \
+                --enable-smime \
+                --disable-mono
+
+test.run        yes
+test.target     check
+
+livecheck.type  gnome

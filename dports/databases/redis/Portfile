@@ -1,0 +1,68 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+# $Id$
+
+PortSystem          1.0
+
+name                redis
+version             2.6.10
+categories          databases
+license             BSD
+platforms           darwin
+
+maintainers         gmail.com:brianjlandau openmaintainer
+
+description         Redis is an open source, advanced key-value store.
+long_description    ${description}
+
+homepage            http://redis.io/
+master_sites        googlecode:redis
+
+checksums           rmd160  325fe38733a3882dc6af47961d88d87296675a11 \
+                    sha256  0b930976830afaad40274107a36f9aae0d8a8fbbdea4e566d20765ee502c2a22
+
+patchfiles          patch-redis.conf.diff
+
+post-patch {
+    reinplace "s|@PREFIX@|${prefix}|g" ${worksrcpath}/redis.conf
+}
+
+use_configure       no
+
+variant universal {}
+
+build.args-append   CC="${configure.cc} [get_canonical_archflags cc]"
+
+# disable silent rules
+build.args-append   V=1
+
+destroot.keepdirs   ${destroot}${prefix}/var/db/redis
+
+destroot {
+    xinstall -d ${destroot}${prefix}/var/db/redis
+    xinstall -m 0755 -W ${worksrcpath}/src \
+        redis-benchmark \
+        redis-check-aof \
+        redis-check-dump \
+        redis-cli \
+        redis-server \
+        ${destroot}${prefix}/bin
+    xinstall -m 0644 ${worksrcpath}/redis.conf \
+        ${destroot}${prefix}/etc/redis.conf.sample
+}
+
+post-activate {
+    if {![file exists ${prefix}/etc/redis.conf]} {
+        file copy ${prefix}/etc/redis.conf.sample ${prefix}/etc/redis.conf
+    }
+    xinstall -d ${prefix}/var/log
+    touch ${prefix}/var/log/redis.log
+}
+
+startupitem.create  yes
+startupitem.executable  ${prefix}/bin/redis-server ${prefix}/etc/redis.conf
+
+notes "
+If you prefer to start a redis server manually, rather than using 'port load', then use this command:
+
+    redis-server ${prefix}/etc/redis.conf
+"

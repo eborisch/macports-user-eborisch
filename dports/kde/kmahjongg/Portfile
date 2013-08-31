@@ -1,0 +1,36 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+# $Id$
+
+PortSystem          1.0
+PortGroup           kde4   1.1
+
+name                kmahjongg
+version             4.10.5
+categories          kde kde4 games
+license             GPL-2+
+maintainers         nicos openmaintainer
+description         In KMahjongg the tiles are scrambled and staked on top of \
+                    each other to resemble a certain shape. 
+long_description    ${description} The player then is expected to remove all the \
+                    tiles off the game board by locating each tile’s matching pair.
+platforms           darwin
+homepage            http://games.kde.org/game.php?game=kmahjongg
+master_sites        kde:stable/${version}/src
+use_xz              yes
+distname            ${name}-${version}
+checksums           rmd160  a564163ba0e6b05dd7f23fc7828ad7390268f9ca \
+                    sha256  7dd0cc1572f1b5fc0343f1a6fcd77c7364c3eb4cff0b75d680cce5c27e395109
+
+#Binaries do not link to openssl, nor use the ssl backend of kdelibs4
+license_noconflict  openssl
+
+depends_lib-append  port:kdelibs4 \
+                    port:libkmahjongg \
+                    port:libkdegames
+
+if {![variant_isset docs]} {
+    patchfiles      patch-CMakeLists.diff
+}
+
+livecheck.url       http://kde.mirrors.hoobly.com/stable/
+livecheck.regex     (\\d+(\\.\\d+)+)

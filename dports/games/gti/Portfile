@@ -1,0 +1,31 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8::et:sw=4:ts=4:sts=4
+# $Id$
+
+PortSystem          1.0
+PortGroup           github 1.0
+
+github.setup        rwos gti 1.1.1 v
+categories          games
+maintainers         g5pw openmaintainer
+license             MIT
+
+description         Just a silly git launcher, basically. Inspired by sl.
+long_description    ${description}
+
+platforms           darwin
+
+checksums           rmd160  0c1dc51a43e79477ebec2da08809b8f8fa161ba2 \
+                    sha256  11f38f305aeee444ef7448d19746ff323553fe87ea2cd9bfa602b4e3d29a0c2a
+
+use_configure       no
+
+build.target
+
+patchfiles          Makefile.diff
+
+variant universal {}
+
+# Ensure we are UsingTheRightCompiler
+build.args-append   CC="${configure.cc} [get_canonical_archflags cc]"
+
+destroot.args-append PREFIX=${prefix}

@@ -1,0 +1,26 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+# $Id$
+
+PortSystem          1.0
+PortGroup           perl5 1.0
+
+perl5.branches      5.8 5.10 5.12 5.14 5.16
+perl5.setup         Dancer-Plugin-Database 2.04 ../by-authors/id/B/BI/BIGPRESH
+platforms           darwin
+maintainers         di.uminho.pt:jpo openmaintainer
+supported_archs     noarch
+license             {Artistic GPL}
+
+description         Easy database connections for Dancer applications
+
+long_description    ${name} provides an easy way to obtain a connected DBI \
+                    database handle by simply calling the database keyword \
+                    within your Dancer application.
+
+checksums           rmd160 f2830a7d25c1efb68396342af705b865c7dc29b7 \
+                    sha256 17648674582b7a70ee9655a465dbba39fb77fdd3318d093ba4bc8c49dbb2f64f
+
+if {${perl5.major} != ""} {
+depends_lib-append  port:p${perl5.major}-dancer \
+                    port:p${perl5.major}-dbi
+}

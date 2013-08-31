@@ -1,0 +1,38 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+# $Id$
+
+PortSystem 1.0
+
+name            glibmm
+version         2.36.2
+set branch      [join [lrange [split ${version} .] 0 1] .]
+description     C++ interface to glib
+long_description \
+                ${description}
+maintainers     devans openmaintainer
+categories      devel x11
+platforms       darwin
+license         LGPL-2.1+
+homepage        http://www.gtkmm.org/
+master_sites    gnome:sources/${name}/${branch}/
+
+use_xz          yes
+
+checksums       rmd160  df88264bc1f1968fc1bdc6ace2c509af88941edd \
+                sha256  f15b65bf5740257be03c69f2f5ae71436ac3011ebeb02274b2b99b796c6837cf
+
+depends_build   port:pkgconfig
+
+depends_lib     path:lib/pkgconfig/glib-2.0.pc:glib2 \
+                port:p5.12-xml-parser \
+                port:libsigcxx2
+
+post-destroot {
+    set mmdoctooldir ${prefix}/share/glibmm-2.4/doctool
+    xinstall -d ${destroot}${mmdoctooldir}
+    xinstall -m 0644 -W ${worksrcpath}/docs doc-install.pl doc-postprocess.pl \
+                                            doxygen.css tagfile-to-devhelp2.xsl \
+                                            ${destroot}${mmdoctooldir}
+}
+
+livecheck.type  gnome

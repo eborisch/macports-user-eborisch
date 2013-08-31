@@ -1,0 +1,32 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+# $Id$
+
+PortSystem          1.0
+PortGroup           kde4   1.1
+
+name                kfourinline
+version             4.10.5
+categories          kde kde4 games
+license             LGPL-2+
+maintainers         nicos openmaintainer
+description         KFourInLine is a board game for two players based on the \
+                    Connect-Four game. 
+long_description    ${description} The players try to build up a row of four pieces \
+                    using different strategies.
+platforms           darwin
+homepage            http://games.kde.org/game.php?game=kfourinline
+master_sites        kde:stable/${version}/src
+use_xz              yes
+distname            ${name}-${version}
+checksums           rmd160  02be6813ac4dcec1c2c58aa107ad0307462c7335 \
+                    sha256  57b464d4ac7aaf6e113743626f3b5ab0c86807be944d4cac56d16432bf4e5a52
+
+depends_lib-append  port:kdelibs4 \
+                    port:libkdegames
+
+if {![variant_isset docs]} {
+    patchfiles      patch-CMakeLists.diff
+}
+
+livecheck.url       http://kde.mirrors.hoobly.com/stable/
+livecheck.regex     (\\d+(\\.\\d+)+)
