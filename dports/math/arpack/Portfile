@@ -61,10 +61,10 @@ variant openmpi description {build PARPACK, with OpenMPI} conflicts gcc43 gcc44 
 }
 
 variant mpich description {build PARPACK, with MPICH} conflicts gcc43 gcc44 gcc45 gcc46 gcc47 g95 openmpi {
-    depends_lib-append     path:bin/mpif77:mpich
+    depends_lib-append     path:bin/mpif77-mp:mpich-default
     configure.args-delete  --disable-mpi
     configure.args-append  --enable-mpi
-    configure.env-append   F77=${prefix}/bin/mpif77 MPIF77=${prefix}/bin/mpif77
+    configure.env-append   F77=${prefix}/bin/mpif77-mp MPIF77=${prefix}/bin/mpif77-mp
 }
 
 if { ![variant_isset gcc43] && ![variant_isset gcc44] && ![variant_isset gcc45] && ![variant_isset gcc46] \
